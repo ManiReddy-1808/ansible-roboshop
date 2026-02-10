@@ -11,17 +11,18 @@
     - mongodb
     - catalogue
   tasks:
+  ### CREATE ###
   - name: create EC2 instance
     amazon.aws.ec2_instance:
       instance_type: t3.micro
       security_group: "{{ sg_id }}"
       image_id: "{{ ami_id }}"
-      name: "{{ item }}-{{ env }}"
+      name: "{{ item }}-{{ env }}" # To display Instance name at instances UI
       tags:  
         Project: roboshop
         Component: "{{ item }}"
         Environment: "{{ env }}"
-        Name: "{{ item }}-{{ env }}" # To display Instance name at instances UI
+        Name: "{{ item }}-{{ env }}" 
     loop: "{{ instances }}"  # 1st time mongodb comes here
     register: ec2_output
     when: action == "create"
@@ -41,7 +42,7 @@
       value: "{{ item.instances[0].private_ip_address }}"  # 1st Instance index is 0
       wait: true
     loop: "{{ ec2_output.results }}"
-    # when: action == "create"
+    when: action == "create"
 
   - name: create r53 public record
     amazon.aws.route53:
@@ -53,4 +54,25 @@
       value: "{{ item.instances[0].public_ip_address }}"  # 1st Instance index is 0
       wait: true
     loop: "{{ ec2_output.results }}"
-    when: item.item == "frontend"
+    when:  # List of and
+    - item.item == "frontend"
+    - action == "create"
+
+  ### DESTROY ###
+
+  - name: delete r53 records
+    amazon.aws.route53:
+      state: absent
+      zone: "{{ domain_name }}"
+      record: "{{ item }}-{{ env }}.{{ domain_name }}" # roboshop-dev.daws88s.online
+      type: A
+      ttl: 1
+    loop: "{{ instances }}"
+    when: action == "destroy"
+
+  - name: delete ec2 instance
+    amazon.aws.ec2_instance:
+      state: absent
+      name: "{{ item }}-{{ env }}"
+    loop: "{{ instances }}"
+    when: action == "destroy"
