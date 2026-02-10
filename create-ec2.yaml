@@ -1,5 +1,5 @@
 - name: create EC2 and Route53 records
-  hosts: all  # TO run :: ansible-playbook -i localhost, create-ec2.yaml
+  hosts: all  # To run :: ansible-playbook -i localhost, create-ec2.yaml
   connection: local
   vars:
     sg_id: sg-04303efbdaed5c6f9
@@ -64,7 +64,7 @@
     amazon.aws.route53:
       state: absent
       zone: "{{ domain_name }}"
-      record: "{{ item }}-{{ env }}.{{ domain_name }}" # roboshop-dev.daws88s.online
+      record: "{{ item }}-{{ env }}.{{ domain_name }}" # roboshop-dev.dawsmani.site
       type: A
       ttl: 1
     loop: "{{ instances }}"
