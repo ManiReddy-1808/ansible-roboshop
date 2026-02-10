@@ -1,9 +1,10 @@
 - name: create EC2 and Route53 records
-  hosts: all
+  hosts: all  # TO run :: ansible-playbook -i localhost, create-ec2.yaml
   connection: local
   vars:
     sg_id: sg-04303efbdaed5c6f9
     ami_id: ami-0220d79f3f480ecf5
+    domain_name: dawsmani.site
     env: dev
     instances: # List 
     - mongodb
@@ -26,3 +27,15 @@
   - name: print output
     ansible.builtin.debug:
       msg: "{{ ec2_output }}"
+
+  - name: create r53 records
+    amazon.aws.route53:
+      state: present
+      zone: "{{ domain_name }}"
+      record: "{{ item.item }}-{{ env }}.{{ domain_name }}" # mongodb-dev.dawsmani.site, frontend-dev.dawsmani.site
+      type: A
+      ttl: 1
+      value: "{{ item.instances[0].private_ip_address }}"  # 1st Instance index is 0
+      wait: true
+    loop: "{{ ec2_output.results }}"
+    when: action == "create"
