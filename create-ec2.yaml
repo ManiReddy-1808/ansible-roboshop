@@ -38,4 +38,4 @@
       value: "{{ item.instances[0].private_ip_address }}"  # 1st Instance index is 0
       wait: true
     loop: "{{ ec2_output.results }}"
-    when: action == "create"
+    # when: action == "create"
