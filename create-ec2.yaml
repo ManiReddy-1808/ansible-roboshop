@@ -10,9 +10,9 @@
     domain_name: dawsmani.site
     env: dev
     action: create  # default action is: create
-    # instances: # List 
-    # - mongodb
-    # - catalogue
+    instances: # List 
+    - mongodb
+    - catalogue
   tasks:
   ### CREATE ###
   - name: create EC2 instance
