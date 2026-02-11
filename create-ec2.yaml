@@ -1,3 +1,6 @@
+# To run this play-book
+# ansible-playbook -i localhost,   -e '{"instances":["mongodb","catalogue","redis","user","cart","mysql","shipping","rabbitmq","payment","frontend"]}'  -e action=destroy roboshop.yaml
+
 - name: create EC2 and Route53 records
   hosts: all  # To run :: ansible-playbook -i localhost, create-ec2.yaml
   connection: local
@@ -6,7 +9,7 @@
     ami_id: ami-0220d79f3f480ecf5
     domain_name: dawsmani.site
     env: dev
-    action: destroy
+    action: create  # default action is: create
     instances: # List 
     - mongodb
     - catalogue
@@ -18,7 +21,8 @@
       security_group: "{{ sg_id }}"
       image_id: "{{ ami_id }}"
       name: "{{ item }}-{{ env }}" # To display Instance name at instances UI
-      tags:  
+      wait: false # Perform quick don't wait 
+      tags:  # To know about other what this project is about.
         Project: roboshop
         Component: "{{ item }}"
         Environment: "{{ env }}"
@@ -35,13 +39,13 @@
   - name: create r53 private records
     amazon.aws.route53:
       state: present
-      zone: "{{ domain_name }}"
+      zone: "{{ domain_name }}"  #item is entire result[] of 0th index
       record: "{{ item.item }}-{{ env }}.{{ domain_name }}" # mongodb-dev.dawsmani.site, frontend-dev.dawsmani.site
       type: A
       ttl: 1
       value: "{{ item.instances[0].private_ip_address }}"  # 1st Instance index is 0
-      wait: true
-    loop: "{{ ec2_output.results }}"
+      wait: false
+    loop: "{{ ec2_output.results }}" # list 
     when: action == "create"
 
   - name: create r53 public record
@@ -52,7 +56,7 @@
       type: A
       ttl: 1
       value: "{{ item.instances[0].public_ip_address }}"  # 1st Instance index is 0
-      wait: true
+      wait: false # Perform quick don't wait 
     loop: "{{ ec2_output.results }}"
     when:  # List of and
     - item.item == "frontend"
@@ -74,6 +78,6 @@
     amazon.aws.ec2_instance:
       state: absent
       name: "{{ item }}-{{ env }}"
+      wait: false # Perform quick don't wait 
     loop: "{{ instances }}"
     when: action == "destroy"
-    
