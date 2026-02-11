@@ -40,7 +40,7 @@
     amazon.aws.route53:
       state: present
       zone: "{{ domain_name }}"  #item is entire result[] of 0th index
-      record: "{{ item.item }}-{{ env }}.{{ domain_name }}" # mongodb-dev.dawsmani.site, frontend-dev.dawsmani.site
+      record: "{{ item.item }}-{{ env }}.{{ domain_name }}" # frontend-dev.dawsmani.site, mongodb-dev.dawsmani.site
       type: A
       ttl: 1
       value: "{{ item.instances[0].private_ip_address }}"  # 1st Instance index is 0
@@ -49,11 +49,11 @@
     loop: "{{ ec2_output.results }}" # list 
     when: action == "create"
 
-  - name: create r53 public record
+  - name: create r53 record for frontend
     amazon.aws.route53:
       state: present
       zone: "{{ domain_name }}"
-      record: "{{ item.item }}-{{ env }}.{{ domain_name }}" # roboshop-dev.dawsmani.site
+      record: "roboshop-{{ env }}.{{ domain_name }}" # roboshop-dev.dawsmani.site
       type: A
       ttl: 1
       value: "{{ item.instances[0].public_ip_address }}"  # 1st Instance index is 0
