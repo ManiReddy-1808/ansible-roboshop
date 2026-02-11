@@ -45,6 +45,7 @@
       ttl: 1
       value: "{{ item.instances[0].private_ip_address }}"  # 1st Instance index is 0
       wait: false
+      overwrite: true # replace existing record with new
     loop: "{{ ec2_output.results }}" # list 
     when: action == "create"
 
@@ -57,6 +58,7 @@
       ttl: 1
       value: "{{ item.instances[0].public_ip_address }}"  # 1st Instance index is 0
       wait: false # Perform quick don't wait 
+      overwrite: true # replace existing record with new
     loop: "{{ ec2_output.results }}"
     when:  # List of and
     - item.item == "frontend"
