@@ -59,14 +59,14 @@
 
   - name: print output
     ansible.builtin.debug:
-      msg: " {{ catalogue_output }}"
+      msg: "{{ catalogue_output }}"
 
-  # - name: load the products  # Here shell module used
-  #   ansible.builtin.shell: mongosh --host "{{ MONGODB_HOST }}" </app/db/master-data.js
-  #   when: catalogue_output.stdout  | int < 0
+  - name: load the products  # Here shell module used
+    ansible.builtin.shell: mongosh --host "{{ MONGODB_HOST }}" </app/db/master-data.js
+    when: catalogue_output.stdout  | int < 0 # Then load the products data to mongodb
 
-  # - name: start catalogue
-  #   ansible.builtin.service:
-  #     name: catalogue
-  #     state: restarted
-  #     enabled: yes
+  - name: start catalogue
+    ansible.builtin.service:
+      name: catalogue
+      state: restarted
+      enabled: yes
