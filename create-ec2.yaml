@@ -1,5 +1,5 @@
 # To run this play-book
-# ansible-playbook -i localhost,   -e '{"instances":["mongodb","catalogue","redis","user","cart","mysql","shipping","rabbitmq","payment","frontend"]}' roboshop.yaml
+# ansible-playbook -i localhost,   -e '{"instances":["mongodb","catalogue","redis","user","cart","mysql","shipping","rabbitmq","payment","frontend"]}' -e action=create create-ec2.yaml
 
 - name: create EC2 and Route53 records
   hosts: all  # To run :: ansible-playbook -i localhost, create-ec2.yaml
@@ -9,7 +9,7 @@
     ami_id: ami-0220d79f3f480ecf5
     domain_name: dawsmani.site
     env: dev
-    # action: create  # default action is: create
+    action: create  # default action is: create
     # instances: # List 
     # - mongodb
     # - catalogue
