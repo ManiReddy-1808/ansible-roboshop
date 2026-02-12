@@ -18,7 +18,7 @@
   ### CREATE ###
   - name: create EC2 instance
     amazon.aws.ec2_instance:
-      instance_type: t3.micro
+      instance_type: "t3.micro"
       security_group: "{{ sg_id }}"
       image_id: "{{ ami_id }}"
       name: "{{ item }}-{{ env }}" # To display Instance name at instances UI
@@ -66,6 +66,18 @@
     - action == "create"
 
   ### DESTROY ###
+
+  - name: delete r53 records for frontend
+    amazon.aws.route53:
+      state: absent
+      zone: "{{ domain_name }}"
+      record: "roboshop-{{ env }}.{{ domain_name }}" # roboshop-dev.dawsmani.site
+      type: A
+      ttl: 1
+    loop: "{{ instances }}"
+    when:  # and condition
+    - item == "frontend"
+    - action == "destroy"
 
   - name: delete r53 records
     amazon.aws.route53:
