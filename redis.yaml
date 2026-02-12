@@ -1,5 +1,5 @@
 - name: Configure Redis
-  hosts: all
+  hosts: redis
   become: yes
   tasks:
   - name: enable redis 7
