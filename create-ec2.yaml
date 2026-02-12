@@ -1,6 +1,6 @@
 # To run this play-book
 # Pre-requisite: aws configure  , pip3.9 install boto3 botocore , git clone https://github.com/ManiReddy-1808/ansible-roboshop.git
-# ansible-playbook -i localhost,   -e "instances":["mongodb","catalogue","redis","user","cart","mysql","shipping","rabbitmq","payment","frontend"] -e action=create create-ec2.yaml
+# ansible-playbook -i localhost,   -e "instances=['mongodb','catalogue','redis','user','cart','mysql','shipping','rabbitmq','payment','frontend']" -e action=create create-ec2.yaml
 
 - name: create EC2 and Route53 records
   hosts: all  # To run :: ansible-playbook -i localhost, create-ec2.yaml

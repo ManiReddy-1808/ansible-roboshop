@@ -2,8 +2,8 @@
   hosts: catalogue
   become: yes
   tasks:
-  - name: enable nodejs 20
-    ansible.builtin.command: dnf module enable nodejs:20 -y
+  - name: enable nodejs 20 # Used command module because dnf module not support module enable
+    ansible.builtin.command: dnf module enable nodejs:20 -y 
 
   - name: install nodejs
     ansible.builtin.dnf:
@@ -49,7 +49,7 @@
       path: /app
 
   - name: copy catalogue service
-    ansible.builtin.copy:
+    ansible.builtin.template: # To copy file from local to remote substitute variables
       src: catalogue.service
       dest: /etc/systemd/system/catalogue.service
 
