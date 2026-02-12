@@ -1,45 +1,57 @@
 - name: configure frontend server
   hosts: frontend
   become: yes
+
   tasks:
-  - name: enable nginx 1.24
-    ansible.builtin.dnf:
-      name: '@nginx:1.24'  # @ ? --> Enables + installs the nginx module stream 1.24
-      state: present
 
-  - name: install nginx
-    ansible.builtin.dnf:
-      name: nginx
-      state: present
+    - name: Enable nginx 1.24 module
+      ansible.builtin.dnf:
+        name: '@nginx:1.24'
+        state: present
 
-  - name: Remove the default content
-    ansible.builtin.file:
-      path: /usr/share/nginx/html/*
-      state: absent
+    - name: Install unzip
+      ansible.builtin.dnf:
+        name: unzip
+        state: present
 
-  - name: download frontend
-    ansible.builtin.get_url:
-      url: https://roboshop-artifacts.s3.amazonaws.com/frontend-v3.zip 
-      dest: /tmp/frontend.zip
+    - name: Remove default nginx html directory
+      ansible.builtin.file:
+        path: /usr/share/nginx/html
+        state: absent
 
-  - name: Extract the frontend content.
-    ansible.builtin.command:
-    args:
-      chdir: 
+    - name: Recreate html directory
+      ansible.builtin.file:
+        path: /usr/share/nginx/html
+        state: directory
+        owner: nginx
+        group: nginx
+        mode: '0755'
 
-  - name: unarchieve frontend code
-    ansible.builtin.unarchive:
-      src: /tmp/frontend.zip
-      dest: /usr/share/nginx/html
-      remote_src: yes
+    - name: Download frontend
+      ansible.builtin.get_url:
+        url: https://roboshop-artifacts.s3.amazonaws.com/frontend-v3.zip
+        dest: /tmp/frontend.zip
 
-  - name: copy frontend service
-    ansible.builtin.template:
-      src: nginx.conf
-      dest: /etc/nginx/nginx.conf # To copy file from local to remote substitute variables
+    - name: Unarchive frontend code
+      ansible.builtin.unarchive:
+        src: /tmp/frontend.zip
+        dest: /usr/share/nginx/html
+        remote_src: yes
 
-  - name: start enable nginx
-    ansible.builtin.service:
-      name: nginx
-      state: restarted
-      enabled: true
+    - name: Copy nginx configuration
+      ansible.builtin.template:
+        src: nginx.conf
+        dest: /etc/nginx/nginx.conf
+      notify: Restart nginx
+
+    - name: Ensure nginx is started and enabled
+      ansible.builtin.service:
+        name: nginx
+        state: started
+        enabled: yes
+
+  handlers:
+    - name: Restart nginx
+      ansible.builtin.service:
+        name: nginx
+        state: restarted
