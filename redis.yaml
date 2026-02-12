@@ -26,4 +26,4 @@
     ansible.builtin.service:
       name: redis
       start: restarted
-      enable: yes
+      enabled: yes
