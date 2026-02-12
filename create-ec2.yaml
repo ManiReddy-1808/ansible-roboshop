@@ -1,5 +1,6 @@
 # To run this play-book
-# ansible-playbook -i localhost,   -e '{"instances":["mongodb","catalogue","redis","user","cart","mysql","shipping","rabbitmq","payment","frontend"]}' -e action=create create-ec2.yaml
+# Pre-requisite: aws configure  , pip3.9 install boto3 botocore
+# ansible-playbook -i localhost,   -e "instances":["mongodb","catalogue","redis","user","cart","mysql","shipping","rabbitmq","payment","frontend"] -e action=create create-ec2.yaml
 
 - name: create EC2 and Route53 records
   hosts: all  # To run :: ansible-playbook -i localhost, create-ec2.yaml
@@ -21,7 +22,7 @@
       security_group: "{{ sg_id }}"
       image_id: "{{ ami_id }}"
       name: "{{ item }}-{{ env }}" # To display Instance name at instances UI
-      wait: false # Perform quick don't wait 
+      # wait: false # (don't use wait --> here because we need to create r53 records with private IP)
       tags:  # To know about other what this project is about.
         Project: roboshop
         Component: "{{ item }}"

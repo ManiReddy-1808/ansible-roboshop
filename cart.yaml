@@ -1,5 +1,5 @@
 - name: Configure cart
-  hosts: cart
+  hosts: cart  # [Gathering Facts]
   become: yes
   tasks:
   - name: enable nodejs 20
