@@ -28,7 +28,7 @@
       ansible.builtin.unarchive:
         src: /tmp/frontend.zip
         dest: /usr/share/nginx/html
-        remote_src: yes
+        remote_src: yes # the file is already present on the remote server, so it will not try to copy it from the control machine to the remote server.
 
     - name: remove default nginx
       ansible.builtin.file:
